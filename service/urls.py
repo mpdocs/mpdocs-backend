@@ -6,9 +6,9 @@ from rest_framework.permissions import IsAdminUser
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Service API",
+        title="mpdocs API",
         default_version="v1",
-        description="Service API docs",
+        description="mpdocs API schema",
     ),
     public=True,
     permission_classes=[IsAdminUser],
@@ -27,4 +27,5 @@ urlpatterns = [
         schema_view.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),
+    path("reports/", include("reports.urls", namespace="reports")),
 ]
