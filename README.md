@@ -8,6 +8,12 @@ Template of a Python service that uses Django-REST framework with poetry. Build,
 
 ### Create virtual environment
 
+```bash
+python -m virtualenv --python=3.12 venv
+```
+
+Activate venv
+
 🔑 Copy `.env.example` to `.env` and change api settings
 
 ### Install dependencies
