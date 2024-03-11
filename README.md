@@ -1,9 +1,6 @@
 # drf_template
 Template of a Python service that uses Django-REST framework with poetry. Build, test and CI scripts ready.
 
-![Linters](https://github.com/TimePeak/users/actions/workflows/linters.yml/badge.svg)
-![Tests](https://github.com/TimePeak/users/actions/workflows/tests.yml/badge.svg)
-
 ## Usage
 
 ### Create virtual environment
