@@ -72,6 +72,58 @@ class ConferenceSerializer(serializers.Serializer):
     participation_type = serializers.CharField()
 
 
+class PatentSerializer(serializers.Serializer):
+    # наименование
+    name = serializers.CharField()
+    # фио авторов (для студентов указать группу)
+    authors_with_work = (serializers.CharField())
+    # номер патента
+    number = serializers.IntegerField()
+    # страна патентования
+    country = serializers.CharField()
+    # патентообладатель
+    patent_owner = serializers.CharField()
+
+
+class SoftwareProductSerializer(serializers.Serializer):
+    # наименование программного продукта
+    name = serializers.CharField()
+    # фио авторов (для студентов указать группу)
+    authors_with_work = (serializers.CharField())
+    # место регистрации
+    registration_place = serializers.CharField()
+    # где используется
+    where_used = serializers.CharField()
+
+
+class ExhibitionSerializer(serializers.Serializer):
+    # наименование выставки
+    name = serializers.CharField()
+    # дата проведения
+    date = serializers.DateField()
+    # место проведения
+    place = serializers.CharField()
+    # фио авторов (для студентов указать группу)
+    authors_with_work = (serializers.CharField())
+    # cтатус выставки
+    exhibition_type = serializers.CharField()
+    # наименования экспонатов
+    exhibit_names = serializers.CharField()
+    # результат участия
+    result = serializers.CharField()
+
+
+class ContestSerializer(serializers.Serializer):
+    # наименование конкурса
+    name = serializers.CharField()
+    # наименование заявки
+    application_name = serializers.CharField()
+    # фио руководителя
+    leader = (serializers.CharField())
+    # фио ответственного исполнителя
+    executor = (serializers.CharField())
+
+
 class ReportSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
@@ -104,3 +156,17 @@ class ReportSerializer(serializers.Serializer):
 
     # 3.3 Перечень конференций, в которых принимал участие в 2021-22 уч. году. (в том числе с участием студентов)
     conferences = serializers.ListSerializer(child=ConferenceSerializer())
+
+    # 3.4 Перечень международных и Российских патентов, полученных в 2021-22 уч. году. (в том числе с участием студентов)
+    patents = serializers.ListSerializer(child=PatentSerializer())
+
+    # 3.5 Разработанные и зарегистрированные программные продукты. (в том числе с участием студентов)
+    software_products = serializers.ListSerializer(child=SoftwareProductSerializer())
+
+    # 3.5 Участие в выставках. (в том числе с участием студентов)
+    exhibitions = serializers.ListSerializer(child=ExhibitionSerializer())
+
+    # 3.6 Перечень заявок, поданных на участие в федеральных, региональных и прочих конкурсах НИР
+    contests = serializers.ListSerializer(child=ContestSerializer())
+
+
