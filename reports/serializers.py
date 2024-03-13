@@ -157,7 +157,7 @@ class ReportSerializer(serializers.Serializer):
     # 3.3 Перечень конференций, в которых принимал участие в 2021-22 уч. году. (в том числе с участием студентов)
     conferences = serializers.ListSerializer(child=ConferenceSerializer())
 
-    # 3.4 Перечень международных и Российских патентов, полученных в 2021-22 уч. году. (в том числе с участием студентов)
+    # 3.4 Перечень международных и Российских патентов, полученных в 2021-22 уч. году. (в т. ч. с участием студентов)
     patents = serializers.ListSerializer(child=PatentSerializer())
 
     # 3.5 Разработанные и зарегистрированные программные продукты. (в том числе с участием студентов)
@@ -168,5 +168,3 @@ class ReportSerializer(serializers.Serializer):
 
     # 3.6 Перечень заявок, поданных на участие в федеральных, региональных и прочих конкурсах НИР
     contests = serializers.ListSerializer(child=ContestSerializer())
-
-
