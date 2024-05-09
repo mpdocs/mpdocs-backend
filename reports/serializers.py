@@ -76,7 +76,7 @@ class PatentSerializer(serializers.Serializer):
     # наименование
     name = serializers.CharField()
     # фио авторов (для студентов указать группу)
-    authors_with_work = (serializers.CharField())
+    authors_fullname = serializers.CharField()
     # номер патента
     number = serializers.IntegerField()
     # страна патентования
@@ -89,7 +89,7 @@ class SoftwareProductSerializer(serializers.Serializer):
     # наименование программного продукта
     name = serializers.CharField()
     # фио авторов (для студентов указать группу)
-    authors_with_work = (serializers.CharField())
+    authors_fullname = serializers.CharField()
     # место регистрации
     registration_place = serializers.CharField()
     # где используется
@@ -103,8 +103,8 @@ class ExhibitionSerializer(serializers.Serializer):
     date = serializers.DateField()
     # место проведения
     place = serializers.CharField()
-    # фио авторов (для студентов указать группу)
-    authors_with_work = (serializers.CharField())
+    # фио участников (для студентов указать группу)
+    participants_fullname = serializers.CharField()
     # cтатус выставки
     exhibition_type = serializers.CharField()
     # наименования экспонатов
@@ -119,9 +119,53 @@ class ContestSerializer(serializers.Serializer):
     # наименование заявки
     application_name = serializers.CharField()
     # фио руководителя
-    leader = (serializers.CharField())
+    leader_fullname = serializers.CharField()
     # фио ответственного исполнителя
-    executor = (serializers.CharField())
+    responsible_executor_fullname = serializers.CharField()
+
+
+class ScientificPublicationSerializer(serializers.Serializer):
+    # фио авторов (для студентов указать группу)
+    authors_fullname = serializers.CharField()
+    # наименование публикации, количество печатных листов
+    name = serializers.CharField()
+    # библиографические данные
+    bibliographic_data = serializers.CharField()
+
+
+class StudentWorkSerializer(serializers.Serializer):
+    # название конкурса, статус
+    contest = serializers.CharField()
+    # организатор конкурса
+    organizer = serializers.CharField()
+    # наименование работы
+    name = serializers.CharField()
+    # фио авторов (для студентов указать группу)
+    authors_fullname = serializers.CharField()
+
+
+class OlympiadSerializer(serializers.Serializer):
+    # название олимпиады, статус
+    name = serializers.CharField()
+    # дата проведения
+    date = serializers.DateField()
+    # место проведения
+    place = serializers.CharField()
+    # фио участника, номер группы
+    participant_fullname = serializers.CharField()
+    # результат
+    result = serializers.CharField()
+
+
+class ActivitiesParticipationSerializer(serializers.Serializer):
+    # содержание работы
+    content = serializers.CharField()
+    # степень участия,
+    participant_degree = serializers.CharField()
+    # результат
+    result = serializers.CharField()
+    # примечания, рекомендации
+    notes = serializers.CharField()
 
 
 class ReportSerializer(serializers.Serializer):
@@ -144,8 +188,8 @@ class ReportSerializer(serializers.Serializer):
     # 2.1 Перечень изданных учебно-методических пособий и указаний за 2021-22уч.год
     methodical_works = serializers.ListSerializer(child=MethodicalWorkSerializer())
 
-    # 3.Сведения о научной и научно-методической работе
-    # 3.1. Сведения об опубликованных монографиях
+    # 3 Сведения о научной и научно-методической работе
+    # 3.1 Сведения об опубликованных монографиях
     monographs = serializers.ListSerializer(child=MonographSerializer())
 
     # 3.2 Перечень статей в журналах, опубликованных в 2021-22 уч.году
@@ -168,3 +212,30 @@ class ReportSerializer(serializers.Serializer):
 
     # 3.6 Перечень заявок, поданных на участие в федеральных, региональных и прочих конкурсах НИР
     contests = serializers.ListSerializer(child=ContestSerializer())
+
+    # 4 Сведения о научно-исследовательской работе совместно со студентами в 2021-22 уч. году
+    # 4.1 Перечень научных публикаций с участием студентов
+    scientific_publications = serializers.ListSerializer(
+        child=ScientificPublicationSerializer()
+    )
+
+    # 4.2 Перечень студенческих работ, поданных на конкурсы на лучшую НИР
+    student_works = serializers.ListSerializer(child=StudentWorkSerializer)
+
+    # 4.3 Руководство студентами, участвующих  в Олимпиадах
+    olympiads = serializers.ListSerializer(child=OlympiadSerializer)
+
+    # 5 Сведения об участии в организационной работе кафедры  в 2021-22 уч. году.
+    organizational_participations = serializers.ListSerializer(
+        child=ActivitiesParticipationSerializer
+    )
+
+    # 6 сведения об участии в профориентационной работе
+    professional_orientation_participations = serializers.ListSerializer(
+        child=ActivitiesParticipationSerializer
+    )
+
+    # 7 Сведения об участии в учебно-воспитательной работе
+    educational_participations = serializers.ListSerializer(
+        child=ActivitiesParticipationSerializer
+    )
