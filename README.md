@@ -40,3 +40,9 @@ pre-commit run --all-files
 ### Run project
 
 🚀 Run project via `python manage.py runserver`
+
+### Generate openapi schema
+
+```bash
+python manage.py spectacular --color --file ./docs/api/schema.yml
+```

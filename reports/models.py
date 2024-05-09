@@ -1,5 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django_stubs_ext.db.models import TypedModelMeta
+
+from reports import utils
 
 User = get_user_model()
 
@@ -28,10 +31,6 @@ class ReportTemplate(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        verbose_name = "Шаблон отчёта"
-        verbose_name_plural = "Шаблоны отчётов"
-
     def __str__(self):
         return f"Отчёт {self.name} - {self.version}"
 
@@ -43,6 +42,10 @@ class ReportTemplate(models.Model):
             f"updated_at={self.updated_at})"
         )
 
+    class Meta(TypedModelMeta):
+        verbose_name = "Шаблон отчёта"
+        verbose_name_plural = "Шаблоны отчётов"
+
 
 class Report(models.Model):
     user = models.ForeignKey(
@@ -51,16 +54,34 @@ class Report(models.Model):
         verbose_name="Пользователь",
         null=True,
     )
+    template = models.ForeignKey(
+        ReportTemplate,
+        on_delete=models.SET_NULL,  # хотим хранить отчёт, даже если кто-то удалил темплейт
+        verbose_name="Шаблон, по которому заполняется отчет",
+        null=True,
+    )
+    data = models.JSONField(
+        verbose_name="Содержание отчета",
+        null=True,  # сомнительно
+        encoder=utils.DateTimeEncoder,
+    )
+
+    is_reviewed = models.BooleanField(
+        null=False,
+        blank=False,
+        default=False,
+        verbose_name="Просматривал ли отчет модератор",
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = "Отчёт"
-        verbose_name_plural = "Отчёты"
 
     def __str__(self):
         return f"Отчёт пользователя {self.user.username} от {self.created_at}"
 
     def __repr__(self):
         return f"Report(user={self.user}, created_at={self.created_at}, updated_at={self.updated_at})"
+
+    class Meta(TypedModelMeta):
+        verbose_name = "Отчёт"
+        verbose_name_plural = "Отчёты"

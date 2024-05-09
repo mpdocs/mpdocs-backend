@@ -22,8 +22,10 @@ INSTALLED_APPS = [
     # Apps
     "reports.apps.ReportsConfig",
     # Plugins
+    "rest_framework",
     "corsheaders",
-    "drf_yasg",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",  # required for Django collectstatic discovery
 ]
 
 MIDDLEWARE = [
@@ -43,12 +45,14 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
         "rest_framework.renderers.AdminRenderer",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 ROOT_URLCONF = "service.urls"
@@ -102,3 +106,15 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "mpdocs API",
+    "DESCRIPTION": "mpdocs",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",  # shorthand to use the sidecar instead
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAuthenticated"],
+}

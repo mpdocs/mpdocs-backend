@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from reports.models import Report
+
 
 class QualificationImprovementSerializer(serializers.Serializer):
     # Форма повышения квалификации
@@ -168,7 +170,8 @@ class ActivitiesParticipationSerializer(serializers.Serializer):
     notes = serializers.CharField()
 
 
-class ReportSerializer(serializers.Serializer):
+class ReportCreateRequestSerializer(serializers.Serializer):
+    template_id = serializers.IntegerField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     patronymic = serializers.CharField()
@@ -220,22 +223,41 @@ class ReportSerializer(serializers.Serializer):
     )
 
     # 4.2 Перечень студенческих работ, поданных на конкурсы на лучшую НИР
-    student_works = serializers.ListSerializer(child=StudentWorkSerializer)
+    student_works = serializers.ListSerializer(child=StudentWorkSerializer())
 
     # 4.3 Руководство студентами, участвующих  в Олимпиадах
-    olympiads = serializers.ListSerializer(child=OlympiadSerializer)
+    olympiads = serializers.ListSerializer(child=OlympiadSerializer())
 
-    # 5 Сведения об участии в организационной работе кафедры  в 2021-22 уч. году.
+    # 5 Сведения об участии в организационной работе кафедры в 2021-22 уч. году.
     organizational_participations = serializers.ListSerializer(
-        child=ActivitiesParticipationSerializer
+        child=ActivitiesParticipationSerializer()
     )
 
     # 6 сведения об участии в профориентационной работе
     professional_orientation_participations = serializers.ListSerializer(
-        child=ActivitiesParticipationSerializer
+        child=ActivitiesParticipationSerializer()
     )
 
     # 7 Сведения об участии в учебно-воспитательной работе
     educational_participations = serializers.ListSerializer(
-        child=ActivitiesParticipationSerializer
+        child=ActivitiesParticipationSerializer()
     )
+
+
+class ReportCreateResponseSerializer(serializers.ModelSerializer[Report]):
+    class Meta:
+        model = Report
+        fields = ["id", "user", "data", "is_reviewed", "created_at", "updated_at"]
+
+
+class ReportListSerializer(serializers.Serializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    patronymic = serializers.CharField()
+
+    report_start_date = serializers.DateField()
+    report_end_date = serializers.DateField()
+
+
+class ReportListRequestSerializer(serializers.Serializer):
+    pass

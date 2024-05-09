@@ -1,0 +1,530 @@
+openapi: 3.0.3
+info:
+  title: mpdocs API
+  version: 1.0.0
+  description: mpdocs
+paths:
+  /auth/token/:
+    post:
+      operationId: auth_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /auth/token/refresh/:
+    post:
+      operationId: auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /reports/:
+    get:
+      operationId: reports_list
+      tags:
+      - reports
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: reports_create
+      tags:
+      - reports
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReportCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReportCreateRequest'
+        required: true
+      security:
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportCreateResponse'
+          description: ''
+components:
+  schemas:
+    ActivitiesParticipation:
+      type: object
+      properties:
+        content:
+          type: string
+        participant_degree:
+          type: string
+        result:
+          type: string
+        notes:
+          type: string
+      required:
+      - content
+      - notes
+      - participant_degree
+      - result
+    Article:
+      type: object
+      properties:
+        name:
+          type: string
+        authors_with_work:
+          type: string
+        publisher:
+          type: string
+        pages_count:
+          type: string
+      required:
+      - authors_with_work
+      - name
+      - pages_count
+      - publisher
+    Conference:
+      type: object
+      properties:
+        name:
+          type: string
+        date:
+          type: string
+          format: date
+        place:
+          type: string
+        status:
+          type: string
+        participation_type:
+          type: string
+      required:
+      - date
+      - name
+      - participation_type
+      - place
+      - status
+    Contest:
+      type: object
+      properties:
+        name:
+          type: string
+        application_name:
+          type: string
+        leader_fullname:
+          type: string
+        responsible_executor_fullname:
+          type: string
+      required:
+      - application_name
+      - leader_fullname
+      - name
+      - responsible_executor_fullname
+    Exhibition:
+      type: object
+      properties:
+        name:
+          type: string
+        date:
+          type: string
+          format: date
+        place:
+          type: string
+        participants_fullname:
+          type: string
+        exhibition_type:
+          type: string
+        exhibit_names:
+          type: string
+        result:
+          type: string
+      required:
+      - date
+      - exhibit_names
+      - exhibition_type
+      - name
+      - participants_fullname
+      - place
+      - result
+    MethodicalWork:
+      type: object
+      properties:
+        name:
+          type: string
+        authors:
+          type: string
+        type:
+          type: string
+        publisher:
+          type: string
+        pages_count:
+          type: string
+      required:
+      - authors
+      - name
+      - pages_count
+      - publisher
+      - type
+    Monograph:
+      type: object
+      properties:
+        name:
+          type: string
+        authors_with_work:
+          type: string
+        publisher:
+          type: string
+        pages_count:
+          type: string
+      required:
+      - authors_with_work
+      - name
+      - pages_count
+      - publisher
+    Olympiad:
+      type: object
+      properties:
+        name:
+          type: string
+        date:
+          type: string
+          format: date
+        place:
+          type: string
+        participant_fullname:
+          type: string
+        result:
+          type: string
+      required:
+      - date
+      - name
+      - participant_fullname
+      - place
+      - result
+    Patent:
+      type: object
+      properties:
+        name:
+          type: string
+        authors_fullname:
+          type: string
+        number:
+          type: integer
+        country:
+          type: string
+        patent_owner:
+          type: string
+      required:
+      - authors_fullname
+      - country
+      - name
+      - number
+      - patent_owner
+    QualificationImprovement:
+      type: object
+      properties:
+        form:
+          type: string
+        country:
+          type: string
+        organization:
+          type: string
+        course_name:
+          type: string
+        diploma_number:
+          type: string
+        diploma_date:
+          type: string
+          format: date
+        hours_count:
+          type: integer
+      required:
+      - country
+      - course_name
+      - diploma_date
+      - diploma_number
+      - form
+      - hours_count
+      - organization
+    ReportCreateRequest:
+      type: object
+      properties:
+        template_id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        patronymic:
+          type: string
+        work_time_coefficient:
+          type: number
+          format: double
+        academic_degree:
+          type: string
+        position:
+          type: string
+        report_start_date:
+          type: string
+          format: date
+        report_end_date:
+          type: string
+          format: date
+        qualification_improvement:
+          type: array
+          items:
+            $ref: '#/components/schemas/QualificationImprovement'
+        methodical_works:
+          type: array
+          items:
+            $ref: '#/components/schemas/MethodicalWork'
+        monographs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Monograph'
+        scopus_articles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Article'
+        web_of_science_articles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Article'
+        vak_articles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Article'
+        rinc_articles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Article'
+        conferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/Conference'
+        patents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Patent'
+        software_products:
+          type: array
+          items:
+            $ref: '#/components/schemas/SoftwareProduct'
+        exhibitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Exhibition'
+        contests:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contest'
+        scientific_publications:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScientificPublication'
+        student_works:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentWork'
+        olympiads:
+          type: array
+          items:
+            $ref: '#/components/schemas/Olympiad'
+        organizational_participations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivitiesParticipation'
+        professional_orientation_participations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivitiesParticipation'
+        educational_participations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivitiesParticipation'
+      required:
+      - academic_degree
+      - conferences
+      - contests
+      - educational_participations
+      - exhibitions
+      - first_name
+      - last_name
+      - methodical_works
+      - monographs
+      - olympiads
+      - organizational_participations
+      - patents
+      - patronymic
+      - position
+      - professional_orientation_participations
+      - qualification_improvement
+      - report_end_date
+      - report_start_date
+      - rinc_articles
+      - scientific_publications
+      - scopus_articles
+      - software_products
+      - student_works
+      - template_id
+      - vak_articles
+      - web_of_science_articles
+      - work_time_coefficient
+    ReportCreateResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          nullable: true
+          title: Пользователь
+        data:
+          nullable: true
+          title: Содержание отчета
+        is_reviewed:
+          type: boolean
+          title: Просматривал ли отчет модератор
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - updated_at
+    ScientificPublication:
+      type: object
+      properties:
+        authors_fullname:
+          type: string
+        name:
+          type: string
+        bibliographic_data:
+          type: string
+      required:
+      - authors_fullname
+      - bibliographic_data
+      - name
+    SoftwareProduct:
+      type: object
+      properties:
+        name:
+          type: string
+        authors_fullname:
+          type: string
+        registration_place:
+          type: string
+        where_used:
+          type: string
+      required:
+      - authors_fullname
+      - name
+      - registration_place
+      - where_used
+    StudentWork:
+      type: object
+      properties:
+        contest:
+          type: string
+        organizer:
+          type: string
+        name:
+          type: string
+        authors_fullname:
+          type: string
+      required:
+      - authors_fullname
+      - contest
+      - name
+      - organizer
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
