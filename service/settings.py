@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "reports.apps.ReportsConfig",
     # Plugins
     "rest_framework",
+    "rest_framework_simplejwt",
     "corsheaders",
     "drf_spectacular",
     "drf_spectacular_sidecar",  # required for Django collectstatic discovery
