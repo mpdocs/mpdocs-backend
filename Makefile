@@ -1,8 +1,8 @@
-up-dev:
+up:
 	docker compose -f docker-compose.dev.yaml up -d
 
-down-dev:
+down:
 	docker compose -f docker-compose.dev.yaml down
 
-build-dev:
+build:
 	docker compose -f docker-compose.dev.yaml build
