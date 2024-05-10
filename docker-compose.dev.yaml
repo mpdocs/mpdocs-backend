@@ -5,7 +5,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.dev
-    command: poetry run python manage.py runserver 0.0.0.0:8000
+    command: ["bash", "./scripts/startup.sh"]
     ports:
       - "8000:8000"
     volumes:
