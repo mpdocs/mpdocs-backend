@@ -5,7 +5,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.dev
-    command: ["bash", "./scripts/startup.sh"]
+    command: ["bash", "./scripts/startup.dev.sh"]
     ports:
       - "8000:8000"
     volumes:

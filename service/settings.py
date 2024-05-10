@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     # Apps
     "reports.apps.ReportsConfig",
+    "users.apps.UsersConfig",
     # Plugins
     "rest_framework",
     "rest_framework_simplejwt",
@@ -104,6 +105,8 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+AUTH_USER_MODEL = "users.CustomUser"
 
 TIME_ZONE = "Europe/Moscow"
 
