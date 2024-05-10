@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
     # Apps
     "reports.apps.ReportsConfig",
     # Plugins
@@ -79,8 +80,12 @@ WSGI_APPLICATION = "service.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("DB_NAME", default="postgres", cast=str),
+        "USER": config("DB_USER", default="postgres", cast=str),
+        "PASSWORD": config("DB_PASS", default="postgres", cast=str),
+        "HOST": config("DB_HOST", default="localhost", cast=str),
+        "PORT": config("DB_PORT", default="5432", cast=str),
     }
 }
 
