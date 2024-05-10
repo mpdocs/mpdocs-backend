@@ -1,13 +1,16 @@
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions, status
 from rest_framework.request import Request
 from rest_framework.response import Response
 
 from reports.models import Report, ReportTemplate
+from reports.permissions import IsReportOwnerOrReadOnly
 from reports.serializers import (
-    ReportCreateRequestSerializer,
-    ReportCreateResponseSerializer,
     ReportListRequestSerializer,
+    ReportListSerializer,
+    ReportDetailSerializer,
+    ReportDataSerializer,
 )
 
 
@@ -17,37 +20,58 @@ class ReportsListView(generics.ListCreateAPIView):
 
     def get_serializer_class(self, *args, **kwargs):
         if self.request.method == "POST":
-            return ReportCreateRequestSerializer
-        return ReportListRequestSerializer
+            return ReportDataSerializer
+        return ReportListSerializer
 
     @extend_schema(
-        request=ReportCreateRequestSerializer,
+        request=ReportDataSerializer,
         responses={
-            status.HTTP_201_CREATED: ReportCreateResponseSerializer,
+            status.HTTP_201_CREATED: ReportDetailSerializer,
         },
     )
     def post(self, request: Request, *args, **kwargs) -> Response:
-        serializer = ReportCreateRequestSerializer(data=request.data)
+        serializer = ReportDataSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        try:
-            template = ReportTemplate.objects.get(
-                pk=serializer.validated_data["template_id"]
-            )
-        except ReportTemplate.DoesNotExist:
-            return Response(
-                {"detail": "Report template with given id does not exist"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        template = ReportTemplate.objects.get_latest_active()
 
-        Report.objects.create(
+        report = Report.objects.create(
             user=request.user,
             template=template,
             data=serializer.validated_data,
         )
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(
+            ReportDetailSerializer(report).data, status=status.HTTP_201_CREATED
+        )
+
+    @extend_schema(
+        request=ReportListRequestSerializer,
+        responses={
+            status.HTTP_200_OK: ReportListSerializer,
+        },
+    )
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        return super().get(request, *args, **kwargs)
 
 
-# todo: вьюшка для получения актуального темплейта
-# todo: вьюшка для редактирования отчета
+class ReportDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Report.objects.all()
+    permission_classes = [IsReportOwnerOrReadOnly]
+    serializer_class = ReportDetailSerializer
+
+    def put(self, request: Request, *args, **kwargs) -> Response:
+        serializer = ReportDataSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        pk = kwargs.get("pk")
+        report = get_object_or_404(Report, pk=pk)
+
+        report.data = serializer.validated_data
+        report.save()
+        return Response(
+            status=status.HTTP_200_OK, data=ReportDetailSerializer(report).data
+        )
+
+    def patch(self, request: Request, *args, **kwargs) -> Response:
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

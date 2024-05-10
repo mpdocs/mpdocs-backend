@@ -3,6 +3,7 @@ from django.db import models
 from django_stubs_ext.db.models import TypedModelMeta
 
 from reports import utils
+from reports.managers import ReportTemplateManager
 
 User = get_user_model()
 
@@ -22,22 +23,22 @@ class ReportTemplate(models.Model):
         verbose_name="Файл шаблона",
         help_text="Загрузите файл шаблона в формате docx",
     )
-    version = models.CharField(
-        max_length=255,
-        verbose_name="Версия",
-        help_text="Введите версию шаблона, например, v1",
+
+    is_active = models.BooleanField(
+        verbose_name="Активен ли шаблон", default=False, null=False, blank=False
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    objects = ReportTemplateManager()
+
     def __str__(self):
-        return f"Отчёт {self.name} - {self.version}"
+        return f"Шаблон отчёта {self.name}"
 
     def __repr__(self):
         return (
             f"ReportTemplate(name={self.name}, "
-            f"version={self.version}, "
             f"created_at={self.created_at}, "
             f"updated_at={self.updated_at})"
         )

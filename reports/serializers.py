@@ -1,6 +1,15 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from reports.models import Report
+from reports.models import Report, ReportTemplate
+
+User = get_user_model()
+
+
+class ReportUserSerializer(serializers.ModelSerializer[User]):
+    class Meta:
+        model = User
+        fields = ["id", "first_name", "last_name", "username"]
 
 
 class QualificationImprovementSerializer(serializers.Serializer):
@@ -170,11 +179,15 @@ class ActivitiesParticipationSerializer(serializers.Serializer):
     notes = serializers.CharField()
 
 
-class ReportCreateRequestSerializer(serializers.Serializer):
-    template_id = serializers.IntegerField()
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    patronymic = serializers.CharField()
+# class ReportCreateRequestSerializer(serializers.Serializer):
+#     template_id = serializers.IntegerField()
+# эти поля можно получить из request.user
+# first_name = serializers.CharField()
+# last_name = serializers.CharField()
+# patronymic = serializers.CharField()
+
+
+class ReportDataSerializer(serializers.Serializer):
     work_time_coefficient = serializers.FloatField()  # Например, 1.0 ставки
     # ученая степень
     academic_degree = serializers.CharField()
@@ -244,20 +257,57 @@ class ReportCreateRequestSerializer(serializers.Serializer):
     )
 
 
-class ReportCreateResponseSerializer(serializers.ModelSerializer[Report]):
+class ReportTemplateSerializer(serializers.ModelSerializer[ReportTemplate]):
+    class Meta:
+        model = ReportTemplate
+        fields = [
+            "id",
+            "name",
+        ]
+
+
+# class ReportCreateSerializer(serializers.ModelSerializer[Report]):
+#     data = ReportDataSerializer()
+#
+#     class Meta:
+#         model = Report
+#         fields = ["data", ]
+
+
+class ReportListSerializer(serializers.ModelSerializer[Report]):
+    user = ReportUserSerializer()
+    template = ReportTemplateSerializer()
+
     class Meta:
         model = Report
-        fields = ["id", "user", "data", "is_reviewed", "created_at", "updated_at"]
-
-
-class ReportListSerializer(serializers.Serializer):
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    patronymic = serializers.CharField()
-
-    report_start_date = serializers.DateField()
-    report_end_date = serializers.DateField()
+        fields = ["id", "user", "template", "is_reviewed", "created_at", "updated_at"]
+        extra_kwargs = {
+            "user": {"read_only": True},
+            "template": {"read_only": True},
+            "is_reviewed": {"read_only": True},
+        }
 
 
 class ReportListRequestSerializer(serializers.Serializer):
     pass
+
+
+class ReportDetailSerializer(serializers.ModelSerializer[Report]):
+    user = ReportUserSerializer(read_only=True)
+    template = ReportTemplateSerializer(read_only=True)
+    data = ReportDataSerializer()
+
+    class Meta:
+        model = Report
+        fields = [
+            "id",
+            "user",
+            "template",
+            "data",
+            "is_reviewed",
+            "created_at",
+            "updated_at",
+        ]
+        extra_kwargs = {
+            "is_reviewed": {"read_only": True},
+        }
