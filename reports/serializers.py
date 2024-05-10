@@ -1,4 +1,15 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from reports.models import Report, ReportTemplate
+
+User = get_user_model()
+
+
+class ReportUserSerializer(serializers.ModelSerializer[User]):
+    class Meta:
+        model = User
+        fields = ["id", "first_name", "last_name", "username"]
 
 
 class QualificationImprovementSerializer(serializers.Serializer):
@@ -168,10 +179,15 @@ class ActivitiesParticipationSerializer(serializers.Serializer):
     notes = serializers.CharField()
 
 
-class ReportSerializer(serializers.Serializer):
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    patronymic = serializers.CharField()
+# class ReportCreateRequestSerializer(serializers.Serializer):
+#     template_id = serializers.IntegerField()
+# эти поля можно получить из request.user
+# first_name = serializers.CharField()
+# last_name = serializers.CharField()
+# patronymic = serializers.CharField()
+
+
+class ReportDataSerializer(serializers.Serializer):
     work_time_coefficient = serializers.FloatField()  # Например, 1.0 ставки
     # ученая степень
     academic_degree = serializers.CharField()
@@ -220,22 +236,78 @@ class ReportSerializer(serializers.Serializer):
     )
 
     # 4.2 Перечень студенческих работ, поданных на конкурсы на лучшую НИР
-    student_works = serializers.ListSerializer(child=StudentWorkSerializer)
+    student_works = serializers.ListSerializer(child=StudentWorkSerializer())
 
     # 4.3 Руководство студентами, участвующих  в Олимпиадах
-    olympiads = serializers.ListSerializer(child=OlympiadSerializer)
+    olympiads = serializers.ListSerializer(child=OlympiadSerializer())
 
-    # 5 Сведения об участии в организационной работе кафедры  в 2021-22 уч. году.
+    # 5 Сведения об участии в организационной работе кафедры в 2021-22 уч. году.
     organizational_participations = serializers.ListSerializer(
-        child=ActivitiesParticipationSerializer
+        child=ActivitiesParticipationSerializer()
     )
 
     # 6 сведения об участии в профориентационной работе
     professional_orientation_participations = serializers.ListSerializer(
-        child=ActivitiesParticipationSerializer
+        child=ActivitiesParticipationSerializer()
     )
 
     # 7 Сведения об участии в учебно-воспитательной работе
     educational_participations = serializers.ListSerializer(
-        child=ActivitiesParticipationSerializer
+        child=ActivitiesParticipationSerializer()
     )
+
+
+class ReportTemplateSerializer(serializers.ModelSerializer[ReportTemplate]):
+    class Meta:
+        model = ReportTemplate
+        fields = [
+            "id",
+            "name",
+        ]
+
+
+# class ReportCreateSerializer(serializers.ModelSerializer[Report]):
+#     data = ReportDataSerializer()
+#
+#     class Meta:
+#         model = Report
+#         fields = ["data", ]
+
+
+class ReportListSerializer(serializers.ModelSerializer[Report]):
+    user = ReportUserSerializer()
+    template = ReportTemplateSerializer()
+
+    class Meta:
+        model = Report
+        fields = ["id", "user", "template", "is_reviewed", "created_at", "updated_at"]
+        extra_kwargs = {
+            "user": {"read_only": True},
+            "template": {"read_only": True},
+            "is_reviewed": {"read_only": True},
+        }
+
+
+class ReportListRequestSerializer(serializers.Serializer):
+    pass
+
+
+class ReportDetailSerializer(serializers.ModelSerializer[Report]):
+    user = ReportUserSerializer(read_only=True)
+    template = ReportTemplateSerializer(read_only=True)
+    data = ReportDataSerializer()
+
+    class Meta:
+        model = Report
+        fields = [
+            "id",
+            "user",
+            "template",
+            "data",
+            "is_reviewed",
+            "created_at",
+            "updated_at",
+        ]
+        extra_kwargs = {
+            "is_reviewed": {"read_only": True},
+        }
