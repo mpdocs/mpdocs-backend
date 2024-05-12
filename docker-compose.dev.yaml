@@ -6,8 +6,6 @@ services:
       context: ./
       dockerfile: Dockerfile.dev
     command: ["bash", "./scripts/startup.dev.sh"]
-    ports:
-      - "8000:8000"
     volumes:
       - ./:/service
     env_file:
@@ -26,6 +24,15 @@ services:
       - "5432:5432"
     volumes:
       - postgresdata:/var/lib/postgresql/data/
+
+  nginx:
+    image: nginx:stable-alpine3.17-slim
+    depends_on:
+      - backend
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    ports:
+      - "8081:80"
 
 volumes:
   postgresdata:
