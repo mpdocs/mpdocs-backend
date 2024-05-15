@@ -2,9 +2,44 @@ version: "3.8"
 
 services:
   backend:
-    build: ./
-    command: poetry run python manage.py runserver 0.0.0.0:8000
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    command: [ "bash", "./scripts/startup.sh" ]
     ports:
       - "8000:8000"
+    volumes:
+      - ./:/service
     env_file:
       - ./.env
+    depends_on:
+      - postgres
+
+  redis:
+    image: redis:7
+
+  celery:
+    build: .
+    command: poetry run celery -A service worker -l INFO
+    volumes:
+      - .:/service
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - redis
+      - backend
+
+  celery-beat:
+    build: .
+    command: poetry run celery -A service beat
+    volumes:
+      - .:/service
+    env_file:
+      - ./.env
+    depends_on:
+      - celery
+
+volumes:
+  postgresdata:
+    driver: local

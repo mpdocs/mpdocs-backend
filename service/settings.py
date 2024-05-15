@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     # Apps
     "reports.apps.ReportsConfig",
     "users.apps.UsersConfig",
+    "periodics.apps.PeriodicsConfig",
     # Plugins
     "rest_framework",
     "rest_framework_simplejwt",
@@ -31,6 +32,8 @@ INSTALLED_APPS = [
     "corsheaders",
     "drf_spectacular",
     "drf_spectacular_sidecar",  # required for Django collectstatic discovery
+    "django_celery_beat",
+    "django_celery_results",
 ]
 
 MIDDLEWARE = [
@@ -65,7 +68,7 @@ ROOT_URLCONF = "service.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR, "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -161,3 +164,38 @@ default_user_authentication_rule",
 
 if DEBUG:
     SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"] = timedelta(weeks=2)
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379",
+    }
+}
+
+# Celery Configuration Options
+CELERY_TIMEZONE = "Europe/Moscow"
+
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 5 * 60  # 5 minutes
+CELERY_BROKER_URL = config(
+    "CELERY_BROKER_URL", cast=str, default="redis://localhost:6379"
+)
+CELERY_RESULT_BACKEND = config(
+    "CELERY_RESULT_BACKEND", cast=str, default="redis://localhost:6379"
+)
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_CACHE_BACKEND = "default"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_RESULT_EXTENDED = True
+
+ASGI_APPLICATION = "learnify.asgi.application"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_USE_TLS = True
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com", cast=str)
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_HOST_USER = config("EMAIL_USER", default="", cast=str)
+EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD", default="", cast=str)
