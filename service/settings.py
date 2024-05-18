@@ -12,7 +12,7 @@ SECRET_KEY: str = config(
 
 DEBUG: bool = config("DEBUG", default=False, cast=bool)
 
-if DEBUG is True:
+if DEBUG:
     CSRF_TRUSTED_ORIGINS = ['http://localhost:8081']  # чтобы не было ошибок с CSRF
 
 ALLOWED_HOSTS: list[str] = []
