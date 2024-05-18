@@ -121,7 +121,6 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 SPECTACULAR_SETTINGS = {
     "TITLE": "mpdocs API",
     "DESCRIPTION": "mpdocs",
@@ -132,7 +131,6 @@ SPECTACULAR_SETTINGS = {
     "REDOC_DIST": "SIDECAR",
     "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAuthenticated"],
 }
-
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
@@ -165,11 +163,10 @@ default_user_authentication_rule",
 if DEBUG:
     SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"] = timedelta(weeks=2)
 
-
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://localhost:6379",
+        "LOCATION": config("REDIS_URL", cast=str, default="redis://redis:6379"),
     }
 }
 
@@ -178,11 +175,9 @@ CELERY_TIMEZONE = "Europe/Moscow"
 
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 5 * 60  # 5 minutes
-CELERY_BROKER_URL = config(
-    "CELERY_BROKER_URL", cast=str, default="redis://localhost:6379"
-)
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", cast=str, default="redis://redis:6379")
 CELERY_RESULT_BACKEND = config(
-    "CELERY_RESULT_BACKEND", cast=str, default="redis://localhost:6379"
+    "CELERY_RESULT_BACKEND", cast=str, default="redis://redis:6379"
 )
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
