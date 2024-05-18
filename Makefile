@@ -10,5 +10,5 @@ build:
 	docker build -f ./Dockerfile.dev . -t ${REGISTRY}/backend:dev
 
 build-prod:
-	docker build --platform=linux/amd64 -f ./Dockerfile.dev . -t ${REGISTRY}/backend:prod
+	docker build --platform=linux/amd64 -f ./Dockerfile . -t ${REGISTRY}/backend:prod
 
