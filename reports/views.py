@@ -3,7 +3,9 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions, status
 from rest_framework.request import Request
 from rest_framework.response import Response
+from docxtpl import DocxTemplate
 
+from core.permissions import IsStaff
 from reports.models import Report, ReportTemplate
 from reports.permissions import IsReportOwnerOrReadOnly
 from reports.serializers import (
@@ -75,3 +77,30 @@ class ReportDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def patch(self, request: Request, *args, **kwargs) -> Response:
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class ReportGenerateView(generics.CreateAPIView):
+    queryset = Report.objects.all()
+    permission_classes = [IsReportOwnerOrReadOnly, IsStaff]
+    serializer_class = ReportDetailSerializer
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        # serializer = ReportDataSerializer(data=request.data)
+        # serializer.is_valid(raise_exception=True)
+
+        pk = kwargs.get("pk")
+        report = get_object_or_404(Report, pk=pk)
+
+        doc = DocxTemplate(report.template.template_file.file)
+
+        context = report.data
+        context["first_name"] = report.user.first_name
+        context["last_name"] = report.user.last_name
+        context["patronymic"] = report.user.patronymic
+
+        doc.render(context)
+        # todo generated filename
+        doc.save("generated_doc.docx")
+        # report.data = serializer.validated_data
+        # report.save()
+        return Response(status=status.HTTP_201_CREATED, data={})

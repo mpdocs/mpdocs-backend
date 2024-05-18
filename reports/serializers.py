@@ -188,12 +188,14 @@ class ActivitiesParticipationSerializer(serializers.Serializer):
 
 
 class ReportDataSerializer(serializers.Serializer):
+    # фио берем из report.user
     work_time_coefficient = serializers.FloatField()  # Например, 1.0 ставки
     # ученая степень
     academic_degree = serializers.CharField()
     # должность
     position = serializers.CharField()
 
+    # todo: сделать полями модели отдельными, чтобы не внутрри json'а лежало
     report_start_date = serializers.DateField()
     report_end_date = serializers.DateField()
     # 1 Информация о повышении квалификации в период 2021-22 уч. год
