@@ -44,7 +44,7 @@ pre-commit run --all-files
 Run celery worker:
 
 ```bash
-celery -A service worker -l INFO`or via `celery -A learnify worker -l INFO
+celery -A service worker -l INFO`or via `celery -A service worker -l INFO
 ```
 
 [//]: # ( -P eventlet)
