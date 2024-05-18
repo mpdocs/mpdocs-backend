@@ -44,7 +44,7 @@ pre-commit run --all-files
 Run celery worker:
 
 ```bash
-celery -A learnify worker -l INFO`or via `celery -A learnify worker -l INFO
+celery -A service worker -l INFO`or via `celery -A learnify worker -l INFO
 ```
 
 [//]: # ( -P eventlet)
@@ -52,7 +52,7 @@ celery -A learnify worker -l INFO`or via `celery -A learnify worker -l INFO
 Run celery scheduler:
 
 ```bash
-celery -A learnify beat
+celery -A service beat
 ```
 
 ### Generate openapi schema

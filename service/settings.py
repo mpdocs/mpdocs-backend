@@ -191,7 +191,7 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_RESULT_EXTENDED = True
 
-ASGI_APPLICATION = "learnify.asgi.application"
+ASGI_APPLICATION = "service.asgi.application"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
