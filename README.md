@@ -41,6 +41,20 @@ pre-commit run --all-files
 
 🚀 Run project via `python manage.py runserver`
 
+Run celery worker:
+
+```bash
+celery -A service worker -l INFO`or via `celery -A service worker -l INFO
+```
+
+[//]: # ( -P eventlet)
+
+Run celery scheduler:
+
+```bash
+celery -A service beat
+```
+
 ### Generate openapi schema
 
 ```bash
