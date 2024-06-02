@@ -2,9 +2,7 @@ version: "3.8"
 
 services:
   backend:
-    build:
-      context: ./
-      dockerfile: Dockerfile.dev
+    image: ghcr.io/mpdocs/backend:dev
     command: ["bash", "./scripts/startup.dev.sh"]
     volumes:
       - ./:/service
@@ -38,7 +36,7 @@ services:
     image: redis:7
 
   celery:
-    build: .
+    image: ghcr.io/mpdocs/backend:dev
     command: poetry run celery -A service worker -l INFO
     volumes:
       - .:/service
@@ -50,7 +48,7 @@ services:
       - backend
 
   celery-beat:
-    build: .
+    image: ghcr.io/mpdocs/backend:dev
     command: poetry run celery -A service beat
     volumes:
       - .:/service
