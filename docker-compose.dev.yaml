@@ -30,7 +30,7 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
     ports:
-      - "8081:80"
+      - "8000:80"
 
   redis:
     image: redis:7
