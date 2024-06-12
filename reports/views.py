@@ -1,11 +1,18 @@
+import datetime
+import pathlib
+import tempfile
+
 from django.shortcuts import get_object_or_404
+from docxtpl import DocxTemplate
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions, status
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from core.permissions import IsStaff
 from reports.models import Report, ReportTemplate
 from reports.permissions import IsReportOwnerOrReadOnly
+from reports.renderers import DocxFileRenderer
 from reports.serializers import (
     ReportListRequestSerializer,
     ReportListSerializer,
@@ -75,3 +82,44 @@ class ReportDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def patch(self, request: Request, *args, **kwargs) -> Response:
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class ReportGenerateView(generics.RetrieveAPIView):
+    queryset = Report.objects.all()
+    permission_classes = [IsReportOwnerOrReadOnly, IsStaff]
+    serializer_class = ReportDetailSerializer
+    renderer_classes = [DocxFileRenderer]
+
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        # todo: убрать эту кучу логики из вьюшки и распихать по функциям
+        pk = kwargs.get("pk")
+        report = get_object_or_404(Report, pk=pk)
+
+        doc = DocxTemplate(report.template.template_file.file)
+
+        context = report.data
+        context["first_name"] = report.user.first_name
+        context["last_name"] = report.user.last_name
+        context["patronymic"] = report.user.patronymic
+        context["report_start_date"] = report.template.report_start_date.strftime("%Y")
+        context["report_end_date"] = report.template.report_end_date.strftime("%Y")
+
+        doc.render(context)
+        filename = (
+            f"{request.user.id}-{report.template.name}-{datetime.datetime.now()}.docx"
+        )
+        generated_filepath = pathlib.Path(tempfile.gettempdir()) / filename
+
+        doc.save(generated_filepath)
+
+        with open(generated_filepath, "rb") as f:
+            data = f.read()
+            return Response(
+                data=data,
+                status=status.HTTP_201_CREATED,
+                headers={
+                    "Content-Disposition": f'attachment; filename="{filename}"',  # noqa: E702
+                    "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "Content-Length": len(data),
+                },
+            )
