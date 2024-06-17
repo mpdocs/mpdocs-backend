@@ -188,6 +188,7 @@ class ActivitiesParticipationSerializer(serializers.Serializer):
 
 
 class ReportDataSerializer(serializers.Serializer):
+    # фио берем из report.user
     work_time_coefficient = serializers.FloatField()  # Например, 1.0 ставки
     # ученая степень
     academic_degree = serializers.CharField()
@@ -221,10 +222,10 @@ class ReportDataSerializer(serializers.Serializer):
     # 3.5 Разработанные и зарегистрированные программные продукты. (в том числе с участием студентов)
     software_products = serializers.ListSerializer(child=SoftwareProductSerializer())
 
-    # 3.5 Участие в выставках. (в том числе с участием студентов)
+    # 3.6 Участие в выставках. (в том числе с участием студентов)
     exhibitions = serializers.ListSerializer(child=ExhibitionSerializer())
 
-    # 3.6 Перечень заявок, поданных на участие в федеральных, региональных и прочих конкурсах НИР
+    # 3.7 Перечень заявок, поданных на участие в федеральных, региональных и прочих конкурсах НИР
     contests = serializers.ListSerializer(child=ContestSerializer())
 
     # 4 Сведения о научно-исследовательской работе совместно со студентами в 2021-22 уч. году
