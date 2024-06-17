@@ -5,7 +5,7 @@ class DocxFileRenderer(BaseRenderer):
     media_type = (
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
-    format = None
+    format = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     charset = None
     render_style = "binary"
 

@@ -4,6 +4,7 @@ import tempfile
 
 from django.shortcuts import get_object_or_404
 from docxtpl import DocxTemplate
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions, status
 from rest_framework.request import Request
@@ -18,6 +19,10 @@ from reports.serializers import (
     ReportListSerializer,
     ReportDetailSerializer,
     ReportDataSerializer,
+)
+
+DOCX_CONTENT_TYPE = (
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 )
 
 
@@ -90,6 +95,9 @@ class ReportGenerateView(generics.RetrieveAPIView):
     serializer_class = ReportDetailSerializer
     renderer_classes = [DocxFileRenderer]
 
+    @extend_schema(
+        responses={("200", DOCX_CONTENT_TYPE): OpenApiTypes.BINARY},
+    )
     def get(self, request: Request, *args, **kwargs) -> Response:
         # todo: убрать эту кучу логики из вьюшки и распихать по функциям
         pk = kwargs.get("pk")
@@ -116,10 +124,10 @@ class ReportGenerateView(generics.RetrieveAPIView):
             data = f.read()
             return Response(
                 data=data,
-                status=status.HTTP_201_CREATED,
+                status=status.HTTP_200_OK,
                 headers={
                     "Content-Disposition": f'attachment; filename="{filename}"',  # noqa: E702
-                    "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "Content-Type": DOCX_CONTENT_TYPE,
                     "Content-Length": len(data),
                 },
             )

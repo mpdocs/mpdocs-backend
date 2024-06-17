@@ -1,6 +1,6 @@
+import django.utils.timezone
 from django.contrib.auth import get_user_model
 from django.db import models
-import django.utils.timezone
 from django_stubs_ext.db.models import TypedModelMeta
 
 from reports import utils
@@ -30,13 +30,12 @@ class ReportTemplate(models.Model):
     )
 
     report_start_date = models.DateTimeField(
-        verbose_name="Дата начала отчетного периода",
-        default=django.utils.timezone.now
+        verbose_name="Дата начала отчетного периода", default=django.utils.timezone.now
     )
 
     report_end_date = models.DateTimeField(
         verbose_name="Дата окончания отчетного периода",
-        default=django.utils.timezone.now
+        default=django.utils.timezone.now,
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -51,8 +50,8 @@ class ReportTemplate(models.Model):
         return (
             f"ReportTemplate(name={self.name}, "
             f"created_at={self.created_at}, "
-            f"updated_at={self.updated_at}"
-            f"report_start_date={self.report_start_date}"
+            f"updated_at={self.updated_at}, "
+            f"report_start_date={self.report_start_date}, "
             f"report_end_date={self.report_end_date})"
         )
 
