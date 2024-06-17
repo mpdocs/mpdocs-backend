@@ -195,9 +195,6 @@ class ReportDataSerializer(serializers.Serializer):
     # должность
     position = serializers.CharField()
 
-    # todo: сделать полями модели отдельными, чтобы не внутрри json'а лежало
-    report_start_date = serializers.DateField()
-    report_end_date = serializers.DateField()
     # 1 Информация о повышении квалификации в период 2021-22 уч. год
     qualification_improvement = serializers.ListSerializer(
         child=QualificationImprovementSerializer()

@@ -101,6 +101,8 @@ class ReportGenerateView(generics.RetrieveAPIView):
         context["first_name"] = report.user.first_name
         context["last_name"] = report.user.last_name
         context["patronymic"] = report.user.patronymic
+        context["report_start_date"] = report.template.report_start_date.strftime("%Y")
+        context["report_end_date"] = report.template.report_end_date.strftime("%Y")
 
         doc.render(context)
         filename = (
