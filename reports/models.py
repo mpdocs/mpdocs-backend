@@ -51,8 +51,8 @@ class ReportTemplate(models.Model):
         return (
             f"ReportTemplate(name={self.name}, "
             f"created_at={self.created_at}, "
-            f"updated_at={self.updated_at})"
-            f"report_start_date={self.report_start_date})"
+            f"updated_at={self.updated_at}"
+            f"report_start_date={self.report_start_date}"
             f"report_end_date={self.report_end_date})"
         )
 
