@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     command: [ "bash", "./scripts/startup.sh" ]
     ports:
-      - "8000:8000"
+      - "8123:8123"
     volumes:
       - ./:/service
     env_file:
