@@ -119,8 +119,8 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -198,12 +198,12 @@ EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 EMAIL_HOST_USER = config("EMAIL_USER", default="", cast=str)
 EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD", default="", cast=str)
 
-# todo: добавить продовый урл
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://0.0.0.0:3000",
+    "https://mpdocs-frontend.vercel.app",
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -211,6 +211,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://0.0.0.0:3000",
+    "https://mpdocs-frontend.vercel.app",
 ]
 
 ALLOWED_HOSTS = [
