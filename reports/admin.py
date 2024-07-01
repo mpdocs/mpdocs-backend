@@ -72,4 +72,3 @@ class StatsAdmin(admin.ModelAdmin):
         "report_template",
         "data",
     )
-

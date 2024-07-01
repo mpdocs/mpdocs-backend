@@ -179,120 +179,13 @@ class StatsGenerateView(generics.RetrieveAPIView):
 
         context = {
             "employees": employees,
-            "dissertations": [  # нет в отчете
-                {
-                    "name": "asdasdasd",
-                    "speciality": "a",
-                    "place": "111",
-                    "theme": '12312'
-                },
-                {
-                    "name": "asdasdasd",
-                    "speciality": "a",
-                    "place": "111",
-                    "theme": '12312'
-                }
-            ],
             "web_of_science_articles": web_of_science_articles,
-            "scopus_articles": scopus_articles
-            #     [
-            #     {
-            #         "name": 'asdasdasd',
-            #         "authors_with_work": "authors_with_work",
-            #         "publisher": "publisher",
-            #         "pages_count": "123"
-            #     },
-            #     {
-            #         "name": 'asdasdasd',
-            #         "authors_with_work": "authors_with_work",
-            #         "publisher": "publisher",
-            #         "pages_count": "123"
-            #     }
-            # ]
-            ,
-            "monographs": monographs
-            #     [
-            #     {
-            #         "name": 'asdasdasd',
-            #         "authors_with_work": "authors_with_work",
-            #         "city": 'city',
-            #         "publisher": "publisher",
-            #         "pages_count": "123"
-            #     },
-            #     {
-            #         "name": 'asdasdasd',
-            #         "authors_with_work": "authors_with_work",
-            #         "city": 'city',
-            #         "publisher": "publisher",
-            #         "pages_count": "123"
-            #     }
-            # ]
-            ,
+            "scopus_articles": scopus_articles,
+            "monographs": monographs,
             "contests": contests,
             "conferences": conferences,
             "patents": patents,
             "software_products": software_products,
-            # "licenses": [  # нет в отчете
-            #     {
-            #         "name": "name",
-            #         "authors_fullname": "authors_fullname",
-            #         "number": 123,
-            #         "licensee": 'asdasdasdasd',
-            #     },
-            #     {
-            #         "name": "licensee",
-            #         "authors_fullname": "authors_fullname",
-            #         "number": 123123,
-            #         "licensee": 'asdasdasd'
-            #     }
-            # ],
-            "exhibitions": exhibitions,
-            # "cooperation_with_countries": [
-            #     {
-            #         "name": "cooperation_with_countries",
-            #         "scope": "scope",
-            #         "organization_name": "organization_name",
-            #         "term": "term"
-            #     },
-            #     {
-            #         "name": "cooperation_with_countries",
-            #         "scope": "scope",
-            #         "organization_name": "organization_name",
-            #         "term": "term"
-            #     }
-            # ],
-            # "international_events": [
-            #     {
-            #         "name": "international_events",
-            #         "participant_fullname": "participant_fullname",
-            #         "place": "place",
-            #         "date": "date"
-            #     }
-            # ],
-            # "student_count_total": 123123,
-            # "student_count_total_with_wages": 12,
-            # "presentation_count_total": 123,
-            # "international_presentation_count_total": 123,
-            # "russian_presentation_count_total": 123,
-            # "regional_presentation_count_total": 123,
-            # "exhibit_count_total": 123,
-            # "international_exhibit_count_total": 123,
-            # "russian_exhibit_count_total": 123,
-            # "regional_exhibit_count_total": 123,
-            # "articles_count_total": 123,
-            # "articles_count_total_published": 1,
-            # "student_works_count_total_without_coauthors": 1,
-            # "student_works_count_total": 12,
-            # "student_works_count_total_open_contest": 123,
-            # "award_count_total": 123,
-            # "award_count_total_open_contest": 123,
-            # "rid_application_count_total": 123,
-            # "rip_protection_document_count_total": 123,
-            # "sold_license_count_total": 123,
-            # "grant_application_project_count_total": 123,
-            # "grant_application_project_count_total_winner": 123,
-            # "olympiad_count_total": 123,
-            # "olympiad_participant_student_count_total": 1337
         }
         doc.render(context)
         filename = (
