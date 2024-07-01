@@ -11,7 +11,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from core.permissions import IsStaff
-from reports.models import Report, ReportTemplate
+from reports.models import Report, ReportTemplate, StatsTemplate
 from reports.permissions import IsReportOwnerOrReadOnly
 from reports.renderers import DocxFileRenderer
 from reports.serializers import (
@@ -115,6 +115,188 @@ class ReportGenerateView(generics.RetrieveAPIView):
         doc.render(context)
         filename = (
             f"{request.user.id}-{report.template.name}-{datetime.datetime.now()}.docx"
+        )
+        generated_filepath = pathlib.Path(tempfile.gettempdir()) / filename
+
+        doc.save(generated_filepath)
+
+        with open(generated_filepath, "rb") as f:
+            data = f.read()
+            return Response(
+                data=data,
+                status=status.HTTP_200_OK,
+                headers={
+                    "Content-Disposition": f'attachment; filename="{filename}"',  # noqa: E702
+                    "Content-Type": DOCX_CONTENT_TYPE,
+                    "Content-Length": len(data),
+                },
+            )
+
+
+class StatsGenerateView(generics.RetrieveAPIView):
+    permission_classes = [IsStaff]
+    renderer_classes = [DocxFileRenderer]
+
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        template = ReportTemplate.objects.get_latest_active()
+        reports = Report.objects.filter(template=template)
+        employees = []
+        web_of_science_articles = []
+        scopus_articles = []
+        monographs = []
+        contests = []
+        conferences = []
+        patents = []
+        software_products = []
+        exhibitions = []
+        for report in reports:
+            user = report.user
+            data = report.data
+            employees.append({
+                "name": user.first_name + " " + user.last_name + " " + user.patronymic,
+                "position": data["position"],
+                "academic_degree": data["academic_degree"]
+            })
+            for web_of_science_article in data["web_of_science_articles"]:
+                web_of_science_articles.append(web_of_science_article)
+            for scopus_article in data["scopus_articles"]:
+                scopus_articles.append(scopus_article)
+            for monograph in data["monographs"]:
+                monographs.append(monograph)
+            for contest in data["contests"]:
+                contests.append(contest)
+            for conference in data["conferences"]:
+                conferences.append(conference)
+            for patent in data["patents"]:
+                patents.append(patent)
+            for software_product in data["software_products"]:
+                software_products.append(software_product)
+            for exhibition in data["exhibitions"]:
+                exhibitions.append(exhibition)
+
+        stats_template = StatsTemplate.objects.order_by("-updated_at").first()
+        doc = DocxTemplate(stats_template.template_file.file)
+
+        context = {
+            "employees": employees,
+            "dissertations": [  # нет в отчете
+                {
+                    "name": "asdasdasd",
+                    "speciality": "a",
+                    "place": "111",
+                    "theme": '12312'
+                },
+                {
+                    "name": "asdasdasd",
+                    "speciality": "a",
+                    "place": "111",
+                    "theme": '12312'
+                }
+            ],
+            "web_of_science_articles": web_of_science_articles,
+            "scopus_articles": scopus_articles
+            #     [
+            #     {
+            #         "name": 'asdasdasd',
+            #         "authors_with_work": "authors_with_work",
+            #         "publisher": "publisher",
+            #         "pages_count": "123"
+            #     },
+            #     {
+            #         "name": 'asdasdasd',
+            #         "authors_with_work": "authors_with_work",
+            #         "publisher": "publisher",
+            #         "pages_count": "123"
+            #     }
+            # ]
+            ,
+            "monographs": monographs
+            #     [
+            #     {
+            #         "name": 'asdasdasd',
+            #         "authors_with_work": "authors_with_work",
+            #         "city": 'city',
+            #         "publisher": "publisher",
+            #         "pages_count": "123"
+            #     },
+            #     {
+            #         "name": 'asdasdasd',
+            #         "authors_with_work": "authors_with_work",
+            #         "city": 'city',
+            #         "publisher": "publisher",
+            #         "pages_count": "123"
+            #     }
+            # ]
+            ,
+            "contests": contests,
+            "conferences": conferences,
+            "patents": patents,
+            "software_products": software_products,
+            # "licenses": [  # нет в отчете
+            #     {
+            #         "name": "name",
+            #         "authors_fullname": "authors_fullname",
+            #         "number": 123,
+            #         "licensee": 'asdasdasdasd',
+            #     },
+            #     {
+            #         "name": "licensee",
+            #         "authors_fullname": "authors_fullname",
+            #         "number": 123123,
+            #         "licensee": 'asdasdasd'
+            #     }
+            # ],
+            "exhibitions": exhibitions,
+            # "cooperation_with_countries": [
+            #     {
+            #         "name": "cooperation_with_countries",
+            #         "scope": "scope",
+            #         "organization_name": "organization_name",
+            #         "term": "term"
+            #     },
+            #     {
+            #         "name": "cooperation_with_countries",
+            #         "scope": "scope",
+            #         "organization_name": "organization_name",
+            #         "term": "term"
+            #     }
+            # ],
+            # "international_events": [
+            #     {
+            #         "name": "international_events",
+            #         "participant_fullname": "participant_fullname",
+            #         "place": "place",
+            #         "date": "date"
+            #     }
+            # ],
+            # "student_count_total": 123123,
+            # "student_count_total_with_wages": 12,
+            # "presentation_count_total": 123,
+            # "international_presentation_count_total": 123,
+            # "russian_presentation_count_total": 123,
+            # "regional_presentation_count_total": 123,
+            # "exhibit_count_total": 123,
+            # "international_exhibit_count_total": 123,
+            # "russian_exhibit_count_total": 123,
+            # "regional_exhibit_count_total": 123,
+            # "articles_count_total": 123,
+            # "articles_count_total_published": 1,
+            # "student_works_count_total_without_coauthors": 1,
+            # "student_works_count_total": 12,
+            # "student_works_count_total_open_contest": 123,
+            # "award_count_total": 123,
+            # "award_count_total_open_contest": 123,
+            # "rid_application_count_total": 123,
+            # "rip_protection_document_count_total": 123,
+            # "sold_license_count_total": 123,
+            # "grant_application_project_count_total": 123,
+            # "grant_application_project_count_total_winner": 123,
+            # "olympiad_count_total": 123,
+            # "olympiad_participant_student_count_total": 1337
+        }
+        doc.render(context)
+        filename = (
+            f"{stats_template.name}-{datetime.datetime.now()}.docx"
         )
         generated_filepath = pathlib.Path(tempfile.gettempdir()) / filename
 
