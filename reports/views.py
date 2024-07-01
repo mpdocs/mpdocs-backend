@@ -155,7 +155,8 @@ class StatsGenerateView(generics.RetrieveAPIView):
             employees.append({
                 "name": user.first_name + " " + user.last_name + " " + user.patronymic,
                 "position": data["position"],
-                "academic_degree": data["academic_degree"]
+                "academic_degree": data["academic_degree"],
+                "title_count": len(data["web_of_science_articles"]) + len(data["scopus_articles"])
             })
             for web_of_science_article in data["web_of_science_articles"]:
                 web_of_science_articles.append(web_of_science_article)
