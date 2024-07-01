@@ -168,7 +168,7 @@ class StatsGenerateView(generics.RetrieveAPIView):
                 "name": f"{user.first_name} {user.last_name} {user.patronymic}",
                 "position": data.get("position", ""),
                 "academic_degree": data.get("academic_degree", ""),
-                "title_count": len(data.get("web_of_science_articles", [])) + len(data.get("scopus_articles", []))
+                "article_count": len(data.get("web_of_science_articles", [])) + len(data.get("scopus_articles", []))
             })
             # Проходим по каждой категории данных и добавляем их в соответствующие списки
             for category, items in data.items():
