@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from reports.models import Report, ReportTemplate, StatsTemplate, Stats
+from reports.models import Report, ReportTemplate, StatsTemplate
 
 
 @admin.register(Report)
@@ -61,14 +61,4 @@ class StatsTemplateAdmin(admin.ModelAdmin):
         "template_file",
         "created_at",
         "updated_at",
-    )
-
-
-@admin.register(Stats)
-class StatsAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "template",
-        "report_template",
-        "data",
     )

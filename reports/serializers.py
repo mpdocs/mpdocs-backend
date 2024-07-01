@@ -310,5 +310,3 @@ class ReportDetailSerializer(serializers.ModelSerializer[Report]):
         extra_kwargs = {
             "is_reviewed": {"read_only": True},
         }
-
-# class StatsSerializer(serializers.Serializer):

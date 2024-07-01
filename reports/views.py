@@ -149,31 +149,31 @@ class StatsGenerateView(generics.RetrieveAPIView):
         patents = []
         software_products = []
         exhibitions = []
+
+        # Словарь для накопления данных
+        category_map = {
+            "web_of_science_articles": web_of_science_articles,
+            "scopus_articles": scopus_articles,
+            "monographs": monographs,
+            "contests": contests,
+            "conferences": conferences,
+            "patents": patents,
+            "software_products": software_products,
+            "exhibitions": exhibitions,
+        }
         for report in reports:
             user = report.user
             data = report.data
             employees.append({
-                "name": user.first_name + " " + user.last_name + " " + user.patronymic,
-                "position": data["position"],
-                "academic_degree": data["academic_degree"],
-                "title_count": len(data["web_of_science_articles"]) + len(data["scopus_articles"])
+                "name": f"{user.first_name} {user.last_name} {user.patronymic}",
+                "position": data.get("position", ""),
+                "academic_degree": data.get("academic_degree", ""),
+                "title_count": len(data.get("web_of_science_articles", [])) + len(data.get("scopus_articles", []))
             })
-            for web_of_science_article in data["web_of_science_articles"]:
-                web_of_science_articles.append(web_of_science_article)
-            for scopus_article in data["scopus_articles"]:
-                scopus_articles.append(scopus_article)
-            for monograph in data["monographs"]:
-                monographs.append(monograph)
-            for contest in data["contests"]:
-                contests.append(contest)
-            for conference in data["conferences"]:
-                conferences.append(conference)
-            for patent in data["patents"]:
-                patents.append(patent)
-            for software_product in data["software_products"]:
-                software_products.append(software_product)
-            for exhibition in data["exhibitions"]:
-                exhibitions.append(exhibition)
+            # Проходим по каждой категории данных и добавляем их в соответствующие списки
+            for category, items in data.items():
+                if category in category_map:
+                    category_map[category].extend(items)
 
         stats_template = StatsTemplate.objects.order_by("-updated_at").first()
         doc = DocxTemplate(stats_template.template_file.file)
@@ -187,10 +187,11 @@ class StatsGenerateView(generics.RetrieveAPIView):
             "conferences": conferences,
             "patents": patents,
             "software_products": software_products,
+            "exhibitions": exhibitions
         }
         doc.render(context)
         filename = (
-            f"{stats_template.name}-{datetime.datetime.now()}.docx"
+            f"{stats_template.name}-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.docx"
         )
         generated_filepath = pathlib.Path(tempfile.gettempdir()) / filename
 

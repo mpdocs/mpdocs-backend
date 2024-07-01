@@ -125,33 +125,3 @@ class StatsTemplate(models.Model):
     class Meta(TypedModelMeta):
         verbose_name = "Шаблон статистики"
         verbose_name_plural = "Шаблоны статистики"
-
-
-# надо ли хранить их?
-class Stats(models.Model):
-    template = models.ForeignKey(
-        StatsTemplate,
-        on_delete=models.SET_NULL,  # хотим хранить отчёт, даже если кто-то удалил темплейт
-        verbose_name="Шаблон, по которому заполняется статистика",
-        null=True,
-    )
-    report_template = models.ForeignKey(  # для данных из отчета
-        ReportTemplate,
-        on_delete=models.SET_NULL,
-        # хотим хранить отчёты, даже если пользователь удалён
-        verbose_name="Пользователь",
-        null=True, )
-    data = models.JSONField(
-        verbose_name="Содержание статистики",
-        null=True,  # сомнительно
-        encoder=utils.DateTimeEncoder,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"Данные по статистике {self.name}"
-
-    class Meta(TypedModelMeta):
-        verbose_name = "Данные по статистике"
-        verbose_name_plural = "Данные по статистике"
