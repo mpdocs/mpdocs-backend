@@ -11,7 +11,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from core.permissions import IsStaff
-from reports.models import Report, ReportTemplate
+from reports.models import Report, ReportTemplate, StatsTemplate
 from reports.permissions import IsReportOwnerOrReadOnly
 from reports.renderers import DocxFileRenderer
 from reports.serializers import (
@@ -115,6 +115,83 @@ class ReportGenerateView(generics.RetrieveAPIView):
         doc.render(context)
         filename = (
             f"{request.user.id}-{report.template.name}-{datetime.datetime.now()}.docx"
+        )
+        generated_filepath = pathlib.Path(tempfile.gettempdir()) / filename
+
+        doc.save(generated_filepath)
+
+        with open(generated_filepath, "rb") as f:
+            data = f.read()
+            return Response(
+                data=data,
+                status=status.HTTP_200_OK,
+                headers={
+                    "Content-Disposition": f'attachment; filename="{filename}"',  # noqa: E702
+                    "Content-Type": DOCX_CONTENT_TYPE,
+                    "Content-Length": len(data),
+                },
+            )
+
+
+class StatsGenerateView(generics.RetrieveAPIView):
+    permission_classes = [IsStaff]
+    renderer_classes = [DocxFileRenderer]
+
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        template = ReportTemplate.objects.get_latest_active()
+        reports = Report.objects.filter(template=template)
+        employees = []
+        web_of_science_articles = []
+        scopus_articles = []
+        monographs = []
+        contests = []
+        conferences = []
+        patents = []
+        software_products = []
+        exhibitions = []
+
+        # Словарь для накопления данных
+        category_map = {
+            "web_of_science_articles": web_of_science_articles,
+            "scopus_articles": scopus_articles,
+            "monographs": monographs,
+            "contests": contests,
+            "conferences": conferences,
+            "patents": patents,
+            "software_products": software_products,
+            "exhibitions": exhibitions,
+        }
+        for report in reports:
+            user = report.user
+            data = report.data
+            employees.append({
+                "name": f"{user.first_name} {user.last_name} {user.patronymic}",
+                "position": data.get("position", ""),
+                "academic_degree": data.get("academic_degree", ""),
+                "article_count": len(data.get("web_of_science_articles", [])) + len(data.get("scopus_articles", []))
+            })
+            # Проходим по каждой категории данных и добавляем их в соответствующие списки
+            for category, items in data.items():
+                if category in category_map:
+                    category_map[category].extend(items)
+
+        stats_template = StatsTemplate.objects.order_by("-updated_at").first()
+        doc = DocxTemplate(stats_template.template_file.file)
+
+        context = {
+            "employees": employees,
+            "web_of_science_articles": web_of_science_articles,
+            "scopus_articles": scopus_articles,
+            "monographs": monographs,
+            "contests": contests,
+            "conferences": conferences,
+            "patents": patents,
+            "software_products": software_products,
+            "exhibitions": exhibitions
+        }
+        doc.render(context)
+        filename = (
+            f"{stats_template.name}-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.docx"
         )
         generated_filepath = pathlib.Path(tempfile.gettempdir()) / filename
 

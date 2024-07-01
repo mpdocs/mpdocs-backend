@@ -12,3 +12,5 @@ build:
 build-prod:
 	docker build --platform=linux/amd64 -f ./Dockerfile . -t ${REGISTRY}/backend:prod
 
+connect:
+	docker compose exec -it backend bash
