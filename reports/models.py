@@ -98,3 +98,30 @@ class Report(models.Model):
     class Meta(TypedModelMeta):
         verbose_name = "Отчёт"
         verbose_name_plural = "Отчёты"
+
+
+class StatsTemplate(models.Model):
+    """
+    Модель для хранения шаблонов docx статистики
+    """
+
+    # пока не уверен, нужно ли оно будет
+    name = models.TextField(
+        verbose_name="Название шаблона статистики",
+        help_text="Введите название шаблона статистики",
+    )
+    template_file = models.FileField(
+        upload_to="stats_templates",
+        verbose_name="Файл шаблона статистики",
+        help_text="Загрузите файл шаблона статистики в формате docx",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Шаблон статистики {self.name}"
+
+    class Meta(TypedModelMeta):
+        verbose_name = "Шаблон статистики"
+        verbose_name_plural = "Шаблоны статистики"

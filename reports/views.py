@@ -11,7 +11,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from core.permissions import IsStaff
-from reports.models import Report, ReportTemplate
+from reports.models import Report, ReportTemplate, StatsTemplate
 from reports.permissions import IsReportOwnerOrReadOnly
 from reports.renderers import DocxFileRenderer
 from reports.serializers import (
@@ -115,6 +115,92 @@ class ReportGenerateView(generics.RetrieveAPIView):
         doc.render(context)
         filename = (
             f"{request.user.id}-{report.template.name}-{datetime.datetime.now()}.docx"
+        )
+        generated_filepath = pathlib.Path(tempfile.gettempdir()) / filename
+
+        doc.save(generated_filepath)
+
+        with open(generated_filepath, "rb") as f:
+            data = f.read()
+            return Response(
+                data=data,
+                status=status.HTTP_200_OK,
+                headers={
+                    "Content-Disposition": f'attachment; filename="{filename}"',  # noqa: E702
+                    "Content-Type": DOCX_CONTENT_TYPE,
+                    "Content-Length": len(data),
+                },
+            )
+
+
+class StatsGenerateView(generics.RetrieveAPIView):
+    permission_classes = [IsStaff]
+    renderer_classes = [DocxFileRenderer]
+
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        template = ReportTemplate.objects.get_latest_active()
+        reports = Report.objects.filter(template=template)
+
+        context = {
+            "employees": [],
+            "dissertations": [],  # нет в отчете
+            "web_of_science_articles": [],
+            "scopus_articles": [],
+            "monographs": [],
+            "contests": [],
+            "conferences": [],
+            "patents": [],
+            "software_products": [],
+            "licenses": [],  # нет в отчете
+            "exhibitions": [],
+            # нет в отчете
+            "cooperation_with_countries": [],
+            "international_events": [],
+            "student_count_total": 0,
+            "student_count_total_with_wages": 0,
+            "presentation_count_total": 0,
+            "international_presentation_count_total": 0,
+            "russian_presentation_count_total": 0,
+            "regional_presentation_count_total": 0,
+            "exhibit_count_total": 0,
+            "international_exhibit_count_total": 0,
+            "russian_exhibit_count_total": 0,
+            "regional_exhibit_count_total": 0,
+            "articles_count_total": 0,
+            "articles_count_total_published": 0,
+            "student_works_count_total_without_coauthors": 0,
+            "student_works_count_total": 0,
+            "student_works_count_total_open_contest": 0,
+            "award_count_total": 0,
+            "award_count_total_open_contest": 0,
+            "rid_application_count_total": 0,
+            "rip_protection_document_count_total": 0,
+            "sold_license_count_total": 0,
+            "grant_application_project_count_total": 0,
+            "grant_application_project_count_total_winner": 0,
+            "olympiad_count_total": 0,
+            "olympiad_participant_student_count_total": 0
+            # /нет в отчете
+        }
+        for report in reports:
+            user = report.user
+            data = report.data
+            context["employees"].append({
+                "name": f"{user.first_name} {user.last_name} {user.patronymic}",
+                "position": data.get("position", ""),
+                "academic_degree": data.get("academic_degree", ""),
+                "article_count": len(data.get("web_of_science_articles", [])) + len(data.get("scopus_articles", []))
+            })
+            for category, items in data.items():
+                if category in context:
+                    context[category].extend(items)
+
+        stats_template = StatsTemplate.objects.order_by("-updated_at").first()
+        doc = DocxTemplate(stats_template.template_file.file)
+
+        doc.render(context)
+        filename = (
+            f"{stats_template.name}-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.docx"
         )
         generated_filepath = pathlib.Path(tempfile.gettempdir()) / filename
 
