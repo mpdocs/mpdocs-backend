@@ -143,6 +143,7 @@ class StatsGenerateView(generics.RetrieveAPIView):
 
         context = {
             "employees": [],
+            "dissertations": [],  # нет в отчете
             "web_of_science_articles": [],
             "scopus_articles": [],
             "monographs": [],
@@ -150,7 +151,36 @@ class StatsGenerateView(generics.RetrieveAPIView):
             "conferences": [],
             "patents": [],
             "software_products": [],
+            "licenses": [],  # нет в отчете
             "exhibitions": [],
+            # нет в отчете
+            "cooperation_with_countries": [],
+            "international_events": [],
+            "student_count_total": 0,
+            "student_count_total_with_wages": 0,
+            "presentation_count_total": 0,
+            "international_presentation_count_total": 0,
+            "russian_presentation_count_total": 0,
+            "regional_presentation_count_total": 0,
+            "exhibit_count_total": 0,
+            "international_exhibit_count_total": 0,
+            "russian_exhibit_count_total": 0,
+            "regional_exhibit_count_total": 0,
+            "articles_count_total": 0,
+            "articles_count_total_published": 0,
+            "student_works_count_total_without_coauthors": 0,
+            "student_works_count_total": 0,
+            "student_works_count_total_open_contest": 0,
+            "award_count_total": 0,
+            "award_count_total_open_contest": 0,
+            "rid_application_count_total": 0,
+            "rip_protection_document_count_total": 0,
+            "sold_license_count_total": 0,
+            "grant_application_project_count_total": 0,
+            "grant_application_project_count_total_winner": 0,
+            "olympiad_count_total": 0,
+            "olympiad_participant_student_count_total": 0
+            # /нет в отчете
         }
         for report in reports:
             user = report.user
