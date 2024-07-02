@@ -140,55 +140,34 @@ class StatsGenerateView(generics.RetrieveAPIView):
     def get(self, request: Request, *args, **kwargs) -> Response:
         template = ReportTemplate.objects.get_latest_active()
         reports = Report.objects.filter(template=template)
-        employees = []
-        web_of_science_articles = []
-        scopus_articles = []
-        monographs = []
-        contests = []
-        conferences = []
-        patents = []
-        software_products = []
-        exhibitions = []
 
-        # Словарь для накопления данных
-        category_map = {
-            "web_of_science_articles": web_of_science_articles,
-            "scopus_articles": scopus_articles,
-            "monographs": monographs,
-            "contests": contests,
-            "conferences": conferences,
-            "patents": patents,
-            "software_products": software_products,
-            "exhibitions": exhibitions,
+        context = {
+            "employees": [],
+            "web_of_science_articles": [],
+            "scopus_articles": [],
+            "monographs": [],
+            "contests": [],
+            "conferences": [],
+            "patents": [],
+            "software_products": [],
+            "exhibitions": [],
         }
         for report in reports:
             user = report.user
             data = report.data
-            employees.append({
+            context["employees"].append({
                 "name": f"{user.first_name} {user.last_name} {user.patronymic}",
                 "position": data.get("position", ""),
                 "academic_degree": data.get("academic_degree", ""),
                 "article_count": len(data.get("web_of_science_articles", [])) + len(data.get("scopus_articles", []))
             })
-            # Проходим по каждой категории данных и добавляем их в соответствующие списки
             for category, items in data.items():
-                if category in category_map:
-                    category_map[category].extend(items)
+                if category in context:
+                    context[category].extend(items)
 
         stats_template = StatsTemplate.objects.order_by("-updated_at").first()
         doc = DocxTemplate(stats_template.template_file.file)
 
-        context = {
-            "employees": employees,
-            "web_of_science_articles": web_of_science_articles,
-            "scopus_articles": scopus_articles,
-            "monographs": monographs,
-            "contests": contests,
-            "conferences": conferences,
-            "patents": patents,
-            "software_products": software_products,
-            "exhibitions": exhibitions
-        }
         doc.render(context)
         filename = (
             f"{stats_template.name}-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.docx"
